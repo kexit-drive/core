@@ -1,0 +1,31 @@
+spring:
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: 457981249259-r43o962jlge9mjlnb7ph3b41ruv3n8mj.apps.googleusercontent.com
+            client-secret: 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
+            scope:
+              - openid
+              - email
+              - profile
+              - https://www.googleapis.com/auth/drive.readonly
+        provider:
+          google:
+            authorizationUri: https://accounts.google.com/o/oauth2/v2/auth #?access_type=offline&prompt=select_account
+  data:
+    mongodb:
+      uri: mongodb://admin:password@localhost:27017/kexit-drive?authSource=admin
+
+google-apis-url: https://www.googleapis.com
+
+minio:
+  url: ${MINIO_URL:http://localhost:9000}
+  accessKey: admin
+  secretKey: password
+  bucketName: files
