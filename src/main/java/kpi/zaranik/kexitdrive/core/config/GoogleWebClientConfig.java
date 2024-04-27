@@ -13,32 +13,39 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.support.WebClientAdapter;
 import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 
-@Configuration(proxyBeanMethods = false)
+@Configuration
 public class GoogleWebClientConfig {
 
-    private static final int MAX_IN_MEMORY_SIZE_IN_BYTES = Math.toIntExact(DataSize.ofMegabytes(512).toBytes());
+    @Value("${google-apis-url}")
+    private String googleApisUrl;
 
-    @Bean("authorizedWebClient")
-    public WebClient authorizedWebClient(
+    @Bean
+    public GoogleApiClient googleApiCLient(@Qualifier("servletContextAuthorizedWebClient") WebClient servletContextAuthorizedWebClient) {
+        var factory = HttpServiceProxyFactory
+            .builderFor(WebClientAdapter.create(servletContextAuthorizedWebClient))
+            .build();
+        return factory.createClient(GoogleApiClient.class);
+    }
+
+    @Bean
+    public WebClient servletContextAuthorizedWebClient(
         ClientRegistrationRepository clientRegistrationRepository,
-        OAuth2AuthorizedClientRepository authorizedClientRepository,
-        @Value("${google-apis-url}") String googleApisUrl
+        OAuth2AuthorizedClientRepository authorizedClientRepository
     ) {
-        var oauth2Client = new ServletOAuth2AuthorizedClientExchangeFilterFunction(clientRegistrationRepository, authorizedClientRepository);
-        oauth2Client.setDefaultClientRegistrationId("google");
+        var exchangeFilterFunction = new ServletOAuth2AuthorizedClientExchangeFilterFunction(clientRegistrationRepository, authorizedClientRepository);
         return WebClient.builder()
             .baseUrl(googleApisUrl)
-            .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(MAX_IN_MEMORY_SIZE_IN_BYTES))
-            .apply(oauth2Client.oauth2Configuration())
+            .apply(exchangeFilterFunction.oauth2Configuration())
             .build();
     }
 
     @Bean
-    public GoogleApiClient googleApiCLient(@Qualifier("authorizedWebClient") WebClient authorizedWebClient) {
-        var factory = HttpServiceProxyFactory
-            .builderFor(WebClientAdapter.create(authorizedWebClient))
+    public WebClient fileImportingWebClient(@Value("${web-client-max-in-memory-size-in-megabytes}") long maxInMemorySizeMB) {
+        int maxInMemorySizeInBytes = Math.toIntExact(DataSize.ofMegabytes(maxInMemorySizeMB).toBytes());
+        return WebClient.builder()
+            .baseUrl(googleApisUrl)
+            .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(maxInMemorySizeInBytes))
             .build();
-        return factory.createClient(GoogleApiClient.class);
     }
 
 }

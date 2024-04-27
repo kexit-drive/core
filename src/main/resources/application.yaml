@@ -17,15 +17,20 @@ spring:
               - https://www.googleapis.com/auth/drive.readonly
         provider:
           google:
-            authorizationUri: https://accounts.google.com/o/oauth2/v2/auth #?access_type=offline&prompt=select_account
+            authorizationUri: https://accounts.google.com/o/oauth2/v2/auth?access_type=offline&prompt=select_account
   data:
     mongodb:
       uri: mongodb://admin:password@localhost:27017/kexit-drive?authSource=admin
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: admin
+    password: password
+    listener:
+      direct:
+        retry:
+          enabled: true
 
 google-apis-url: https://www.googleapis.com
-
-minio:
-  url: ${MINIO_URL:http://localhost:9000}
-  accessKey: admin
-  secretKey: password
-  bucketName: files
+frontend-url: ${FRONTEND_URL:http://localhost:5000}
+web-client-max-in-memory-size-in-megabytes: 512

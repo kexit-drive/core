@@ -1,4 +1,4 @@
-package kpi.zaranik.kexitdrive.core.service;
+package kpi.zaranik.kexitdrive.core.service.user;
 
 import kpi.zaranik.kexitdrive.core.client.GoogleApiClient;
 import kpi.zaranik.kexitdrive.core.dto.security.TokenResponse;

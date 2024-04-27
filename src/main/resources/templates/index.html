@@ -13,8 +13,9 @@
     }
 
     async function getAccessToken() {
-      const response = await fetch("/getAccessToken");
-      const accessToken = await response.text();
+      const response = await fetch("user/getAccessToken");
+      const dto = await response.json();
+      const accessToken = dto.token;
       console.log("accessToken = " + accessToken);
       return accessToken;
     }
@@ -31,11 +32,35 @@
 
     function pickerCallback(data) {
       if (data.action == google.picker.Action.PICKED) {
-        var fileIds = data.docs.map(doc => doc.id);
+        const fileIds = data.docs.map(doc => doc.id);
         // Handle the selected file
         console.log('Selected File ID:', fileIds);
+        importFiles(fileIds);
       }
     }
+
+    function importFiles(fileIds) {
+      console.log('importing fetch');
+
+      const myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+
+      const rawBody = JSON.stringify({
+        fileIds
+      });
+
+      console.dir(fileIds);
+
+      const requestOptions = {
+        method: 'POST',
+        body: rawBody,
+        headers: myHeaders,
+        redirect: 'follow'
+      };
+
+      return fetch("http://localhost:8080/file/import", requestOptions);
+    }
+
   </script>
 
   <body>

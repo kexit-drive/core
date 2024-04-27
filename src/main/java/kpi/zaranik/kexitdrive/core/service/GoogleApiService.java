@@ -4,24 +4,25 @@ import java.nio.charset.StandardCharsets;
 import kpi.zaranik.kexitdrive.core.client.GoogleApiClient;
 import kpi.zaranik.kexitdrive.core.dto.DriveFile;
 import kpi.zaranik.kexitdrive.core.dto.FileListDriveResponse;
-import kpi.zaranik.kexitdrive.core.dto.UserInfo;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 
 @Service
 public class GoogleApiService {
 
-    @Autowired
-    private GoogleApiClient client;
+    private final GoogleApiClient client;
+    private final WebClient webClient;
 
-//    public UserInfo getInfoAboutMe(OAuth2AuthorizedClient authorizedClient) {
-//        return client.getUserInfo();
-//    }
+    public GoogleApiService(GoogleApiClient client, @Qualifier("fileImportingWebClient") WebClient webClient) {
+        this.client = client;
+        this.webClient = webClient;
+    }
 
     public FileListDriveResponse getListOfFiles() {
         return client.getListOfFiles();
@@ -42,8 +43,14 @@ public class GoogleApiService {
             .body(resource);
     }
 
-    public String getAccessToken(OAuth2AuthorizedClient authorizedClient) {
-        return authorizedClient.getAccessToken().getTokenValue();
+    public Resource getFileResource(OAuth2AuthorizedClient authorizedClient, String fileId) {
+        String accessToken = authorizedClient.getAccessToken().getTokenValue();
+        return webClient.get()
+            .uri("drive/v3/files/{fileId}?alt=media", fileId)
+            .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+            .retrieve()
+            .bodyToMono(Resource.class)
+            .block();
     }
 
 }
