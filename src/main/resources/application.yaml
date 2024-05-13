@@ -1,8 +1,13 @@
+server:
+  port: 8090
+  forward-headers-strategy: framework
 spring:
+  application:
+    name: kexit-core
   servlet:
     multipart:
-      max-file-size: 100MB
-      max-request-size: 100MB
+      max-file-size: 512MB
+      max-request-size: 512MB
   security:
     oauth2:
       client:
@@ -30,7 +35,13 @@ spring:
       direct:
         retry:
           enabled: true
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://${EUREKAHOSTNAME:localhost}:8761/eureka/
+  instance:
+    healthCheckUrlPath: /actuator/health
+    instanceId: ${spring.application.name}:${spring.application.instance_id:${random.value}}
 
 google-apis-url: https://www.googleapis.com
-frontend-url: ${FRONTEND_URL:http://localhost:5000}
 web-client-max-in-memory-size-in-megabytes: 512

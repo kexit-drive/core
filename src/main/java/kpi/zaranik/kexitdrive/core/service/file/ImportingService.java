@@ -29,7 +29,7 @@ public class ImportingService {
 
             // save resource somehow
 
-            log.info("Successfully imported file with id " + message.fileId() + " for user " + message.userExternalId());
+            log.info("Successfully isImported file with id " + message.fileId() + " for user " + message.userExternalId());
         } catch (Exception e) {
             log.warn("Failed to import file with id " + message.fileId() + " for user " + message.userExternalId(), e);
         }
@@ -44,7 +44,7 @@ public class ImportingService {
 //            log.info("accessToken = " + authorizedClient.getAccessToken().getTokenValue());
 //            log.info("refreshToken = " + authorizedClient.getRefreshToken().getTokenValue());
 //            Resource resource = googleApiService.getFileResource(authorizedClient, fileId);
-//            log.info("Successfully imported file size: " + resource.getContentAsByteArray().length);
+//            log.info("Successfully isImported file size: " + resource.getContentAsByteArray().length);
 //        } catch (Exception e) {
 //            log.error("Some error occurred: ", e);
 //        }
