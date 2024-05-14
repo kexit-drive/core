@@ -23,10 +23,7 @@ public class SecurityConfig {
             .oauth2Client(withDefaults())
             .authorizeHttpRequests(requests ->
                 requests
-                    .anyRequest().permitAll()
-//                    .requestMatchers("/user/test").permitAll()
-//                    .requestMatchers("/test/**").permitAll()
-//                    .anyRequest().authenticated()
+                    .anyRequest().authenticated()
             );
 
         return http.build();
