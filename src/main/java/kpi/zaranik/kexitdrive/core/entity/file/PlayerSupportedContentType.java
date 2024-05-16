@@ -40,6 +40,7 @@ public enum PlayerSupportedContentType {
         Set.of(
             "video/mp4",
             "video/webm",
+            "video/quicktime",
             "video/ogg"
         )
     ),
