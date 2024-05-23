@@ -13,6 +13,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 
 @Configuration
 @EnableWebSecurity
@@ -23,6 +24,7 @@ public class SecurityConfig {
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .csrf(AbstractHttpConfigurer::disable)
+            .logout(l -> l.logoutSuccessHandler(customLogoutSuccessHandler()))
             .oauth2Login(login -> login.successHandler(customOAuth2LoginSuccessHandler()))
             .oauth2Client(withDefaults())
             .authorizeHttpRequests(requests ->
@@ -35,6 +37,13 @@ public class SecurityConfig {
 
     @Bean
     AuthenticationSuccessHandler customOAuth2LoginSuccessHandler() {
+        return (HttpServletRequest request, HttpServletResponse response, Authentication authentication) -> {
+            response.sendRedirect("/");
+        };
+    }
+
+    @Bean
+    LogoutSuccessHandler customLogoutSuccessHandler() {
         return (HttpServletRequest request, HttpServletResponse response, Authentication authentication) -> {
             response.sendRedirect("/");
         };

@@ -179,4 +179,10 @@ public class FileService {
         return convertFrom.stream().findFirst();
     }
 
+    public List<FileResponse> getAllFiles() {
+        String currentUserExternalId = userService.getCurrentUserExternalId().orElseThrow();
+        return fileRepository.findByOwnerUserExternalIdOrderByCreatedDesc(currentUserExternalId)
+            .map(fileEntityMapper::mapToResponse)
+            .toList();
+    }
 }

@@ -1,6 +1,7 @@
 package kpi.zaranik.kexitdrive.core.controller;
 
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import kpi.zaranik.kexitdrive.core.config.security.CurrentUser;
 import kpi.zaranik.kexitdrive.core.dto.UserInfo;
 import kpi.zaranik.kexitdrive.core.dto.file.FileResponse;
@@ -32,6 +33,11 @@ import org.springframework.web.multipart.MultipartFile;
 public class FileController {
 
     private final FileService fileService;
+
+    @GetMapping
+    public List<FileResponse> getAllFiles() {
+        return fileService.getAllFiles();
+    }
 
     @GetMapping("{id}")
     public FileResponse getFileById(@PathVariable String id) {
