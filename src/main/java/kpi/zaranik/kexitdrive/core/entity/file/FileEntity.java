@@ -42,9 +42,9 @@ public record FileEntity(
         return new FileEntity(filename, false, containingDirectoryId, fileMetadata);
     }
 
-    public static FileEntity createImportedFile(String filename, String gridFsFileId, String dataType, String containingDirectoryId) {
+    public static FileEntity createImportedFile(String filename, String gridFsFileId, String dataType, String containingDirectoryId, String ownerUserExternalId) {
         FileMetadata fileMetadata = new FileMetadata(gridFsFileId, dataType, true);
-        return new FileEntity(filename, false, containingDirectoryId, fileMetadata);
+        return new FileEntity(null, filename, ownerUserExternalId, null, false, containingDirectoryId, fileMetadata);
     }
 
     public static FileEntity createDirectory(String directoryName, String containingDirectoryId) {
