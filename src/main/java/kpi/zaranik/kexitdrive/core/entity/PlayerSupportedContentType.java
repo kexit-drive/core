@@ -1,4 +1,4 @@
-package kpi.zaranik.kexitdrive.core.entity.file;
+package kpi.zaranik.kexitdrive.core.entity;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -19,9 +19,16 @@ public enum PlayerSupportedContentType {
     ),
     AUDIO(
         Set.of(
-            "audio/mp3",
             "audio/mpeg",
-            "audio/wav"
+            "audio/ogg",
+
+            /* all .wav formats */
+            "audio/vnd.wav",
+            "audio/wav",
+            "audio/x-wav",
+            "audio/vnd.wave",
+            "audio/wave",
+            "audio/x-pn-wav"
         )
     ),
     IMAGE(

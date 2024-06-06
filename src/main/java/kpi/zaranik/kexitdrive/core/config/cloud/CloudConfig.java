@@ -14,10 +14,9 @@ public class CloudConfig {
 
     @Bean
     @LoadBalanced
-    public WebClient.Builder loadBalancedWebClientBuilder(@Value("${web-client-max-in-memory-size-in-megabytes}") long maxInMemorySizeMB) {
-        int maxInMemorySizeInBytes = Math.toIntExact(DataSize.ofMegabytes(maxInMemorySizeMB).toBytes());
+    public WebClient.Builder loadBalancedWebClientBuilder(@Value("${spring.servlet.multipart.max-file-size}") DataSize maxInMemorySize) {
         return WebClient.builder()
-            .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(maxInMemorySizeInBytes));
+            .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(Math.toIntExact(maxInMemorySize.toBytes())));
     }
 
 }

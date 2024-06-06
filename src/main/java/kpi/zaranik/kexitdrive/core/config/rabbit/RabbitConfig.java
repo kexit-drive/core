@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RabbitConfig {
 
-    @Bean("importFiles")
+    @Bean
     public Queue importFiles() {
         return new Queue(Constants.IMPORT_FILES_QUEUE, false);
     }

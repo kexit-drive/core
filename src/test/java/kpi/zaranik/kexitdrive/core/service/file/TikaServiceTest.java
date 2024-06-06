@@ -30,4 +30,11 @@ class TikaServiceTest {
         Assertions.assertThat(dataType).isEqualTo("application/x-tika-ooxml");
     }
 
+    @Test
+    void fb2File() throws FileNotFoundException {
+        FileInputStream fis = new FileInputStream("src/test/resources/test.fb2");
+        String dataType = tikaService.getDataType(fis);
+        Assertions.assertThat(dataType).isEqualTo("application/x-fictionbook+xml");
+    }
+
 }

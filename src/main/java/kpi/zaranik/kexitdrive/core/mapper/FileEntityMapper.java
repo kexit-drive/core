@@ -3,7 +3,7 @@ package kpi.zaranik.kexitdrive.core.mapper;
 import kpi.zaranik.kexitdrive.core.dto.file.FileResponse;
 import kpi.zaranik.kexitdrive.core.dto.file.FileResponse.FileMetadata;
 import kpi.zaranik.kexitdrive.core.dto.file.FileResponse.FileResponseBuilder;
-import kpi.zaranik.kexitdrive.core.entity.file.FileEntity;
+import kpi.zaranik.kexitdrive.core.entity.FileEntity;
 import org.springframework.stereotype.Service;
 
 @Service

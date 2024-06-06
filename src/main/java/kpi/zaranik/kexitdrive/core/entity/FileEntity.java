@@ -1,4 +1,4 @@
-package kpi.zaranik.kexitdrive.core.entity.file;
+package kpi.zaranik.kexitdrive.core.entity;
 
 import java.time.LocalDateTime;
 import lombok.Builder;

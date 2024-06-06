@@ -44,4 +44,20 @@ eureka:
     instanceId: ${spring.application.name}:${spring.application.instance_id:${random.value}}
 
 google-apis-url: https://www.googleapis.com
-web-client-max-in-memory-size-in-megabytes: 512
+mime-types-to-export:
+  mapping:
+    "[application/vnd.google-apps.document]":
+      "extension": "docx"
+      "export-mime-type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    "[application/vnd.google-apps.spreadsheet]":
+      extension: "xlsx"
+      export-mime-type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    "[application/vnd.google-apps.presentation]":
+      extension: "pptx"
+      export-mime-type: "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+    "[application/vnd.google-apps.drawing]":
+      extension: "png"
+      export-mime-type: "image/png"
+    "[application/vnd.google-apps.script]":
+      extension: "json"
+      export-mime-type: "application/vnd.google-apps.script+json"
