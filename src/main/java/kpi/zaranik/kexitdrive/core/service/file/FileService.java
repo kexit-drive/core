@@ -4,12 +4,15 @@ import static kpi.zaranik.kexitdrive.core.misc.Constants.CONVERT_FROM_PROPERTY_N
 import static kpi.zaranik.kexitdrive.core.misc.Constants.CONVERT_TO_PROPERTY_NAME;
 
 import com.mongodb.client.gridfs.model.GridFSFile;
+import jakarta.validation.Valid;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
 import kpi.zaranik.kexitdrive.core.dto.UserInfo;
+import kpi.zaranik.kexitdrive.core.dto.file.CreateDirectoryRequest;
 import kpi.zaranik.kexitdrive.core.dto.file.FileResponse;
 import kpi.zaranik.kexitdrive.core.dto.file.PlayableResourceResponse;
 import kpi.zaranik.kexitdrive.core.dto.file.PlayerDataTypeResponse;
@@ -39,11 +42,13 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.MultiValueMap;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.client.WebClient;
 
 @Slf4j
 @Service
+@Validated
 @RequiredArgsConstructor
 public class FileService {
 
@@ -74,8 +79,9 @@ public class FileService {
     // 111401278168521168568
     public void importFilesFromGoogleDrive(UserInfo user, ImportFilesRequest request) {
         List<String> fileIds = request.fileIds();
+        String directoryId = request.containingDirectoryId();
         fileIds.stream()
-            .map(id -> new ImportingMessage(user.externalId(), id))
+            .map(id -> new ImportingMessage(user.externalId(), id, directoryId))
             .forEach(message -> rabbitTemplate.convertAndSend(Constants.IMPORT_FILES_QUEUE, message));
     }
 
@@ -94,11 +100,15 @@ public class FileService {
 
     public void deleteFileById(String fileId) {
         FileEntity fileEntity = getFileEntity(fileId);
-        if (!fileEntity.isDirectory()) {
+        if (fileEntity.isDirectory()) {
+            List<FileEntity> innerFiles = fileRepository.findByContainingDirectoryIdIs(fileId);
+            innerFiles.stream().map(FileEntity::id).forEach(this::deleteFileById);
+        } else {
             String gridFsFileId = fileEntity.metadata().gridFsFileId();
             gridFsTemplate.delete(new Query(Criteria.where("_id").is(gridFsFileId)));
         }
         fileRepository.delete(fileEntity);
+        log.info("Deleted file {}", fileId);
     }
 
     private FileEntity getFileEntity(String fileId) {
@@ -179,10 +189,37 @@ public class FileService {
         return convertFrom.stream().findFirst();
     }
 
-    public List<FileResponse> getAllFiles() {
+    public List<FileResponse> getAllFiles(String directoryId) {
         String currentUserExternalId = userService.getCurrentUserExternalId().orElseThrow();
-        return fileRepository.findByOwnerUserExternalIdOrderByCreatedDesc(currentUserExternalId)
-            .map(fileEntityMapper::mapToResponse)
-            .toList();
+        Stream<FileEntity> stream;
+        if (directoryId == null) {
+            stream = fileRepository.findByOwnerUserExternalIdAndContainingDirectoryIdIsNullOrderByCreatedDesc(currentUserExternalId);
+        } else {
+            stream = fileRepository.findByOwnerUserExternalIdAndContainingDirectoryIdOrderByCreatedDesc(currentUserExternalId, directoryId);
+        }
+        return stream.map(fileEntityMapper::mapToResponse).toList();
+    }
+
+    public FileResponse createDirectory(@Valid CreateDirectoryRequest request, String userExternalId) {
+        if (request.containingDirectoryId() != null) {
+            FileEntity containingDirectory = fileRepository.findById(request.containingDirectoryId())
+                .orElseThrow(() -> new ResourceNotFoundException("directory with id " + request.containingDirectoryId() + " not found"));
+            boolean isOwner = containingDirectory.ownerUserExternalId().equals(userExternalId);
+            if (!isOwner) {
+                log.error("user with id {} is not allowed to create a new directory in directory {}", userExternalId, containingDirectory.id());
+                throw new AccessToResourceDeniedException(
+                    "user with id " + userExternalId + " is not allowed to create a new directory in directory " + containingDirectory.id());
+            }
+        }
+        FileEntity newDirectory = FileEntity.createDirectory(request.name(), request.containingDirectoryId());
+        newDirectory = fileRepository.save(newDirectory);
+        return fileEntityMapper.mapToResponse(newDirectory);
+    }
+
+    public void createRootDirectoryIfAbsent(UserInfo currentUser) {
+        boolean exists = fileRepository.existsByOwnerUserExternalId(currentUser.externalId());
+        if (!exists) {
+            createDirectory(new CreateDirectoryRequest("root", null), currentUser.externalId());
+        }
     }
 }

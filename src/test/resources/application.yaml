@@ -1,6 +1,3 @@
-server:
-  port: 8090
-  forward-headers-strategy: framework
 spring:
   application:
     name: kexit-core
@@ -27,25 +24,11 @@ spring:
         provider:
           google:
             authorizationUri: https://accounts.google.com/o/oauth2/v2/auth?access_type=offline&prompt=select_account
-  data:
-    mongodb:
-      uri: mongodb://admin:password@localhost:27017/kexit-drive?authSource=admin
   rabbitmq:
-    host: localhost
-    port: 5672
-    username: admin
-    password: password
     listener:
       direct:
         retry:
           enabled: true
-eureka:
-  client:
-    serviceUrl:
-      defaultZone: http://${EUREKAHOSTNAME:localhost}:8761/eureka/
-  instance:
-    healthCheckUrlPath: /actuator/health
-    instanceId: ${spring.application.name}:${spring.application.instance_id:${random.value}}
 
 google-apis-url: https://www.googleapis.com
 mime-types-to-export:

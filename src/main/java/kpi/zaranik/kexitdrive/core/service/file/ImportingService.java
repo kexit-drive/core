@@ -49,7 +49,7 @@ public class ImportingService {
             }
             String dataType = tikaService.getDataType(resource.getInputStream());
             String gridFsFileId = gridFsTemplate.store(resource.getInputStream(), fileName, dataType).toString();
-            FileEntity importedFile = FileEntity.createImportedFile(fileName, gridFsFileId, dataType, null, message.userExternalId());
+            FileEntity importedFile = FileEntity.createImportedFile(fileName, gridFsFileId, dataType, message.directoryId(), message.userExternalId());
 
             fileEntityRepository.save(importedFile);
 

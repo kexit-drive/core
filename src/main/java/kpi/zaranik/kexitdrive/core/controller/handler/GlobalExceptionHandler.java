@@ -1,4 +1,4 @@
-package kpi.zaranik.kexitdrive.core.controller;
+package kpi.zaranik.kexitdrive.core.controller.handler;
 
 import java.time.LocalDateTime;
 import kpi.zaranik.kexitdrive.core.exception.AccessToResourceDeniedException;

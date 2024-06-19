@@ -4,6 +4,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import kpi.zaranik.kexitdrive.core.config.security.CurrentUser;
 import kpi.zaranik.kexitdrive.core.dto.UserInfo;
+import kpi.zaranik.kexitdrive.core.dto.file.CreateDirectoryRequest;
 import kpi.zaranik.kexitdrive.core.dto.file.FileResponse;
 import kpi.zaranik.kexitdrive.core.dto.file.PlayableResourceResponse;
 import kpi.zaranik.kexitdrive.core.dto.file.PlayerDataTypeResponse;
@@ -35,8 +36,8 @@ public class FileController {
     private final FileService fileService;
 
     @GetMapping
-    public List<FileResponse> getAllFiles() {
-        return fileService.getAllFiles();
+    public List<FileResponse> getAllFiles(@RequestParam(required = false) String directoryId) { // add directory id
+        return fileService.getAllFiles(directoryId);
     }
 
     @GetMapping("{id}")
@@ -70,7 +71,7 @@ public class FileController {
     }
 
     @PostMapping("upload")
-    public UploadedFileResponse uploadFile(@RequestPart MultipartFile file, @RequestParam String directoryId) {
+    public UploadedFileResponse uploadFile(@RequestPart MultipartFile file, @RequestParam(required = false) String directoryId) {
         return fileService.uploadFile(file, directoryId);
     }
 
@@ -82,6 +83,11 @@ public class FileController {
     @DeleteMapping("{id}")
     public void deleteFileById(@PathVariable String id) {
         fileService.deleteFileById(id);
+    }
+
+    @PostMapping("create-directory")
+    public FileResponse createDirectory(@RequestBody CreateDirectoryRequest request, @CurrentUser UserInfo user) {
+        return fileService.createDirectory(request, user.externalId());
     }
 
 }

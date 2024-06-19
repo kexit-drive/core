@@ -4,6 +4,9 @@ import static org.springframework.security.config.Customizer.withDefaults;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import kpi.zaranik.kexitdrive.core.dto.UserInfo;
+import kpi.zaranik.kexitdrive.core.mapper.UserMapper;
+import kpi.zaranik.kexitdrive.core.service.file.FileService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -11,7 +14,9 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 
@@ -20,15 +25,30 @@ import org.springframework.security.web.authentication.logout.LogoutSuccessHandl
 @EnableMethodSecurity
 public class SecurityConfig {
 
+    private static final String[] PERMIT_ALL = {
+        "/swagger-ui/**",
+        "/swagger-ui.html",
+        "/v3/api-docs/**"
+    };
+
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    SecurityFilterChain securityFilterChain(
+        HttpSecurity http,
+        AuthenticationSuccessHandler customAuthenticationSuccessHandler,
+        AuthenticationFailureHandler customAuthenticationFailureHandler,
+        LogoutSuccessHandler customLogoutSuccessHandler
+    ) throws Exception {
         http
             .csrf(AbstractHttpConfigurer::disable)
-            .logout(l -> l.logoutSuccessHandler(customLogoutSuccessHandler()))
-            .oauth2Login(login -> login.successHandler(customOAuth2LoginSuccessHandler()))
+            .logout(l -> l.logoutSuccessHandler(customLogoutSuccessHandler))
+            .oauth2Login(login -> login
+                .successHandler(customAuthenticationSuccessHandler)
+                .failureHandler(customAuthenticationFailureHandler)
+            )
             .oauth2Client(withDefaults())
             .authorizeHttpRequests(requests ->
                 requests
+                    .requestMatchers(PERMIT_ALL).permitAll()
                     .anyRequest().authenticated()
             );
 
@@ -36,8 +56,11 @@ public class SecurityConfig {
     }
 
     @Bean
-    AuthenticationSuccessHandler customOAuth2LoginSuccessHandler() {
+    AuthenticationSuccessHandler customAuthenticationSuccessHandler(FileService fileService, UserMapper userMapper) {
         return (HttpServletRequest request, HttpServletResponse response, Authentication authentication) -> {
+//            OidcUser oidcUser = (OidcUser) authentication.getPrincipal();
+//            UserInfo userInfo = userMapper.mapFromOidcUser(oidcUser);
+//            fileService.createRootDirectoryIfAbsent(userInfo);
             response.sendRedirect("/");
         };
     }
@@ -45,6 +68,13 @@ public class SecurityConfig {
     @Bean
     LogoutSuccessHandler customLogoutSuccessHandler() {
         return (HttpServletRequest request, HttpServletResponse response, Authentication authentication) -> {
+            response.sendRedirect("/");
+        };
+    }
+
+    @Bean
+    AuthenticationFailureHandler customAuthenticationFailureHandler() {
+        return (request, response, exception) -> {
             response.sendRedirect("/");
         };
     }

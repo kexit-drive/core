@@ -30,10 +30,4 @@ public class UserController {
         return userService.getAccessToken(authorizedClient);
     }
 
-    @GetMapping("test")
-    public OAuth2AuthorizedClient getTest() {
-        String userExternalId = "111401278168521168568"; // 107010593884037449481: zaranikuz@gmail.com : Bogdan Zaranik IP-01
-        return authorizedClientFactory.getClientByExternalUserId(userExternalId);
-    }
-
 }

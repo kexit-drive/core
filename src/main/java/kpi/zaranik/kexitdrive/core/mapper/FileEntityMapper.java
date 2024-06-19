@@ -18,12 +18,15 @@ public class FileEntityMapper {
             .filename(entity.filename())
             .created(entity.created())
             .isDirectory(entity.isDirectory())
-            .containingDirectoryId(entity.containingDirectoryId())
-            .metadata(new FileMetadata(
+            .containingDirectoryId(entity.containingDirectoryId());
+
+        if (!entity.isDirectory()) {
+            builder.metadata(new FileMetadata(
                 entity.metadata().gridFsFileId(),
                 entity.metadata().contentType(),
                 entity.metadata().isImported()
             ));
+        }
 
         return builder.build();
     }
