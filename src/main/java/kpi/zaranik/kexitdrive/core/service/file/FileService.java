@@ -14,11 +14,13 @@ import java.util.stream.Stream;
 import kpi.zaranik.kexitdrive.core.dto.UserInfo;
 import kpi.zaranik.kexitdrive.core.dto.file.CreateDirectoryRequest;
 import kpi.zaranik.kexitdrive.core.dto.file.FileResponse;
+import kpi.zaranik.kexitdrive.core.dto.file.MessageResponse;
 import kpi.zaranik.kexitdrive.core.dto.file.PlayableResourceResponse;
 import kpi.zaranik.kexitdrive.core.dto.file.PlayerDataTypeResponse;
 import kpi.zaranik.kexitdrive.core.dto.file.UploadedFileResponse;
 import kpi.zaranik.kexitdrive.core.dto.file.importing.ImportFilesRequest;
 import kpi.zaranik.kexitdrive.core.dto.file.importing.ImportingMessage;
+import kpi.zaranik.kexitdrive.core.dto.file.move.MoveRequest;
 import kpi.zaranik.kexitdrive.core.entity.FileEntity;
 import kpi.zaranik.kexitdrive.core.entity.PlayerSupportedContentType;
 import kpi.zaranik.kexitdrive.core.exception.AccessToResourceDeniedException;
@@ -216,10 +218,12 @@ public class FileService {
         return fileEntityMapper.mapToResponse(newDirectory);
     }
 
-    public void createRootDirectoryIfAbsent(UserInfo currentUser) {
-        boolean exists = fileRepository.existsByOwnerUserExternalId(currentUser.externalId());
-        if (!exists) {
-            createDirectory(new CreateDirectoryRequest("root", null), currentUser.externalId());
-        }
+    public MessageResponse move(MoveRequest request) {
+        FileEntity fileToMove = fileRepository.findById(request.fileId())
+            .orElseThrow(() -> new ResourceNotFoundException("file with id " + request.fileId() + " not found"));
+        FileEntity destinationDirectory = fileRepository.findById(request.destinationDirectoryId())
+            .orElseThrow(() -> new ResourceNotFoundException("file with id " + request.fileId() + " not found"));
+        fileRepository.setNewDirectoryId(fileToMove.id(), destinationDirectory.id());
+        return new MessageResponse("file with id " + request.fileId() + " moved to directory " + request.destinationDirectoryId());
     }
 }

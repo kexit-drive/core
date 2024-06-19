@@ -4,9 +4,6 @@ import static org.springframework.security.config.Customizer.withDefaults;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import kpi.zaranik.kexitdrive.core.dto.UserInfo;
-import kpi.zaranik.kexitdrive.core.mapper.UserMapper;
-import kpi.zaranik.kexitdrive.core.service.file.FileService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -14,7 +11,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -56,11 +52,8 @@ public class SecurityConfig {
     }
 
     @Bean
-    AuthenticationSuccessHandler customAuthenticationSuccessHandler(FileService fileService, UserMapper userMapper) {
+    AuthenticationSuccessHandler customAuthenticationSuccessHandler() {
         return (HttpServletRequest request, HttpServletResponse response, Authentication authentication) -> {
-//            OidcUser oidcUser = (OidcUser) authentication.getPrincipal();
-//            UserInfo userInfo = userMapper.mapFromOidcUser(oidcUser);
-//            fileService.createRootDirectoryIfAbsent(userInfo);
             response.sendRedirect("/");
         };
     }

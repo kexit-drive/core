@@ -6,10 +6,12 @@ import kpi.zaranik.kexitdrive.core.config.security.CurrentUser;
 import kpi.zaranik.kexitdrive.core.dto.UserInfo;
 import kpi.zaranik.kexitdrive.core.dto.file.CreateDirectoryRequest;
 import kpi.zaranik.kexitdrive.core.dto.file.FileResponse;
+import kpi.zaranik.kexitdrive.core.dto.file.MessageResponse;
 import kpi.zaranik.kexitdrive.core.dto.file.PlayableResourceResponse;
 import kpi.zaranik.kexitdrive.core.dto.file.PlayerDataTypeResponse;
 import kpi.zaranik.kexitdrive.core.dto.file.UploadedFileResponse;
 import kpi.zaranik.kexitdrive.core.dto.file.importing.ImportFilesRequest;
+import kpi.zaranik.kexitdrive.core.dto.file.move.MoveRequest;
 import kpi.zaranik.kexitdrive.core.service.file.FileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
@@ -88,6 +90,11 @@ public class FileController {
     @PostMapping("create-directory")
     public FileResponse createDirectory(@RequestBody CreateDirectoryRequest request, @CurrentUser UserInfo user) {
         return fileService.createDirectory(request, user.externalId());
+    }
+
+    @PostMapping("move")
+    public MessageResponse move(@RequestBody MoveRequest request) {
+        return fileService.move(request);
     }
 
 }
