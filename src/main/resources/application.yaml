@@ -29,12 +29,12 @@ spring:
             authorizationUri: https://accounts.google.com/o/oauth2/v2/auth?access_type=offline&prompt=select_account
   data:
     mongodb:
-      uri: mongodb://admin:password@localhost:27017/kexit-drive?authSource=admin
+      uri: ${MONGO_DB_URL}
   rabbitmq:
-    host: localhost
-    port: 5672
-    username: admin
-    password: password
+    host: ${RABBITMQ_HOST}
+    port: ${RABBITMQ_PORT}
+    username: ${RABBITMQ_USERNAME}
+    password: ${RABBITMQ_PASSWORD}
     listener:
       direct:
         retry:

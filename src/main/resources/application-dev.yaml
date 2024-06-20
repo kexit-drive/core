@@ -1,0 +1,13 @@
+spring:
+  data:
+    mongodb:
+      uri: mongodb://admin:password@localhost:27017/kexit-drive?authSource=admin
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: admin
+    password: password
+    listener:
+      direct:
+        retry:
+          enabled: true
