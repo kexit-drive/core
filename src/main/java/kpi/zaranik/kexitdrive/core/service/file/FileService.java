@@ -219,6 +219,9 @@ public class FileService {
     }
 
     public MessageResponse move(MoveRequest request) {
+        if (request.fileId().equals(request.destinationDirectoryId())) {
+            throw new IllegalArgumentException("destination directory id cannot be the same as the file id");
+        }
         FileEntity fileToMove = fileRepository.findById(request.fileId())
             .orElseThrow(() -> new ResourceNotFoundException("file with id " + request.fileId() + " not found"));
         FileEntity destinationDirectory = fileRepository.findById(request.destinationDirectoryId())
